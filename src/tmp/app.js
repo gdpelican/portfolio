@@ -84,7 +84,9 @@
     model: function() {
       return fetchPosts((function(_this) {
         return function() {
-          return _this.store.findAll('post');
+          return _this.store.findAll('post', {
+            order: 'date'
+          });
         };
       })(this));
     }
@@ -104,13 +106,14 @@
     if (App.Post.FIXTURES) {
       return callback();
     } else {
-      return $.getJSON('https://ajax.googleapis.com/ajax/services/feed/load?' + 'v=1.0&num=50&q=http://gdpelican.blogspot.com/feeds/posts/default?' + 'output=rss&callback=?').then(function(data) {
-        var post_id;
-        post_id = 1;
-        App.Post.FIXTURES = data.responseData.feed.entries.map(function(entry) {
+      return $.getJSON('https://ajax.googleapis.com/ajax/services/feed/load?' + 'v=1.0&num=50&q=https://gdpelican.ghost.io/rss/?' + 'output=rss&callback=?').then(function(data) {
+        var entries, post_id;
+        entries = data.responseData.feed.entries;
+        post_id = entries.length;
+        App.Post.FIXTURES = entries.map(function(entry) {
           var post;
           post = {};
-          post.id = post_id++;
+          post.id = post_id--;
           post.title = entry.title;
           post.body = entry.content;
           post.snippet = entry.contentSnippet;
