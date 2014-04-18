@@ -17,18 +17,12 @@ module.exports = function(grunt) {
           { 'src/tmp/style.css': 'src/css/style.scss' },
           { 'src/tmp/normalize.css': 'src/css/normalize.scss'} 
         ] 	
-      },
-      normalize: {
-      	options: { style: 'compressed' },
-      	files: { 'src/tmp/normalize.css': 'src/css/normalize.scss'}
       }
     },
     emberTemplates: {
       compile: {
       	options: { templateBasePath: 'src/templates' },
-      	files: {
-      	  'src/tmp/templates.js': 'src/templates/**/*.hbs'
-      	}
+      	files: { 'src/tmp/templates.js': 'src/templates/**/*.hbs' }
       }
     },
     concat: {
@@ -43,19 +37,34 @@ module.exports = function(grunt) {
       }
     },
     watch: {
-      css: {
+      cssCompile: {
       	files: ['src/css/**/*.scss'],
       	tasks: ['sass'],
-      	options: { spawn: false }
+      	options: { spawn: false, reload: true }
       },
-	  js: {
+      cssConcat: {
+      	files: ['src/tmp/*.css'],
+      	tasks: ['concat'],
+      	options: { spawn: false, reload: true }
+      },
+	  jsCompile: {
 	    files: ['src/js/**/*.coffee'],
 	    tasks: ['coffee'],
-	    options: { spawn: false }
+	    options: { spawn: false, reload: true }
+	  },
+	  jsConcat: {
+	  	files: ['src/tmp/*.js'],
+	  	tasks: ['concat'],
+	  	options: { spawn: false, reload: true }
+	  },
+	  jsMinimize: {
+	  	files: ['dist/*.js'],
+	  	tasks: ['uglify'],
+	  	optiosn: { spawn: false, reload: true }
 	  },
 	  html: {
 	  	files: 'src/templates/**/*.hbs',
-    	tasks: ['emberTemplates', 'livereload']
+    	tasks: ['emberTemplates']
 	  }
 	}
   });
@@ -65,6 +74,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-coffee');
   grunt.loadNpmTasks('grunt-ember-templates');
   grunt.loadNpmTasks('grunt-contrib-concat');
+  grunt.loadNpmTasks('grunt-contrib-uglify');
 
   grunt.registerTask('default', ['sass', 'coffee', 'emberTemplates', 'concat']);
 
