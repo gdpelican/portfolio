@@ -1,4 +1,7 @@
 <h1>Some Thoughts</h1>
 {{#each}}
-	<li>{{#link-to 'post' this}}{{title}}{{/link-to}}</li>
+	<li class="post">
+		<div class="title">{{#link-to 'post' this}}{{title}}{{/link-to}}</div>
+		<div class="date">Posted at {{date}}</div>
+	</li>
 {{/each}}
