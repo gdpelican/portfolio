@@ -84,7 +84,9 @@
     model: function() {
       return fetchPosts((function(_this) {
         return function() {
-          return _this.store.findAll('post');
+          return _this.store.findAll('post', {
+            order: 'date'
+          });
         };
       })(this));
     }
@@ -104,13 +106,14 @@
     if (App.Post.FIXTURES) {
       return callback();
     } else {
-      return $.getJSON('https://ajax.googleapis.com/ajax/services/feed/load?' + 'v=1.0&num=50&q=http://gdpelican.blogspot.com/feeds/posts/default?' + 'output=rss&callback=?').then(function(data) {
-        var post_id;
-        post_id = 1;
-        App.Post.FIXTURES = data.responseData.feed.entries.map(function(entry) {
+      return $.getJSON('https://ajax.googleapis.com/ajax/services/feed/load?' + 'v=1.0&num=50&q=https://gdpelican.ghost.io/rss/?' + 'output=rss&callback=?').then(function(data) {
+        var entries, post_id;
+        entries = data.responseData.feed.entries;
+        post_id = entries.length;
+        App.Post.FIXTURES = entries.map(function(entry) {
           var post;
           post = {};
-          post.id = post_id++;
+          post.id = post_id--;
           post.title = entry.title;
           post.body = entry.content;
           post.snippet = entry.contentSnippet;
@@ -215,7 +218,10 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   data.buffer.push("<h1>");
   stack1 = helpers._triageMustache.call(depth0, "title", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("</h1>\n<article>\n	");
+  data.buffer.push("</h1>\n<div>posted at ");
+  stack1 = helpers._triageMustache.call(depth0, "date", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("</div>\n<article>\n	");
   data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "body", {hash:{
     'unescaped': ("true")
   },hashTypes:{'unescaped': "STRING"},hashContexts:{'unescaped': depth0},contexts:[depth0],types:["ID"],data:data})));
@@ -232,10 +238,13 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
 function program1(depth0,data) {
   
   var buffer = '', stack1, helper, options;
-  data.buffer.push("\n	<li>");
+  data.buffer.push("\n	<li class=\"post\">\n		<div class=\"title\">");
   stack1 = (helper = helpers['link-to'] || (depth0 && depth0['link-to']),options={hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(2, program2, data),contexts:[depth0,depth0],types:["STRING","ID"],data:data},helper ? helper.call(depth0, "post", "", options) : helperMissing.call(depth0, "link-to", "post", "", options));
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("</li>\n");
+  data.buffer.push("</div>\n		<div class=\"date\">Posted at ");
+  stack1 = helpers._triageMustache.call(depth0, "date", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("</div>\n	</li>\n");
   return buffer;
   }
 function program2(depth0,data) {
