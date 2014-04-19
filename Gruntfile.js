@@ -2,12 +2,17 @@ module.exports = function(grunt) {
 
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
+    filesets: {
+    	scss: 	'src/css/**/*.scss',
+    	css: 	'src/tmp/*.css',
+    	coffee: 'src/js/**/*.coffee',
+    	js:		'src/tmp/*.js',
+    	hbs:	'src/templates/**/*.hbs'
+    },
 	coffee: {
 	  options: { join: true },
       compile: {
-        files: {
-          'src/tmp/app.js': ['src/js/**/*.coffee']
-        }
+        files: { 'src/tmp/app.js': '<%= filesets.coffee %>' }
       }
     },
     sass: {
@@ -22,49 +27,35 @@ module.exports = function(grunt) {
     emberTemplates: {
       compile: {
       	options: { templateBasePath: 'src/templates' },
-      	files: { 'src/tmp/templates.js': 'src/templates/**/*.hbs' }
+      	files: { 'src/tmp/templates.js': '<%= filesets.hbs %>' }
       }
     },
     concat: {
       options: { separator: ';' },
-      js: {
-      	src: 'src/tmp/*.js',
-      	dest: 'dist/app.js' 
-      },
       css: {
-      	src: 'src/tmp/*.css',
+      	src: '<%= filesets.css %>',
       	dest: 'dist/style.css'
       }
     },
+    uglify: {
+    	js: {
+    		files: { 'dist/app.js': ['<%= filesets.js %>'] }
+    	}
+    },
     watch: {
-      cssCompile: {
-      	files: ['src/css/**/*.scss'],
-      	tasks: ['sass'],
+      scss: {
+      	files: ['<%= filesets.scss %>'],
+      	tasks: ['sass', 'concat'],
       	options: { spawn: false, reload: true }
       },
-      cssConcat: {
-      	files: ['src/tmp/*.css'],
-      	tasks: ['concat'],
-      	options: { spawn: false, reload: true }
-      },
-	  jsCompile: {
-	    files: ['src/js/**/*.coffee'],
-	    tasks: ['coffee'],
+	  coffee: {
+	    files: ['<%= filesets.coffee %>'],
+	    tasks: ['coffee', 'uglify'],
 	    options: { spawn: false, reload: true }
 	  },
-	  jsConcat: {
-	  	files: ['src/tmp/*.js'],
-	  	tasks: ['concat'],
-	  	options: { spawn: false, reload: true }
-	  },
-	  jsMinimize: {
-	  	files: ['dist/*.js'],
-	  	tasks: ['uglify'],
-	  	optiosn: { spawn: false, reload: true }
-	  },
 	  html: {
-	  	files: 'src/templates/**/*.hbs',
-    	tasks: ['emberTemplates']
+	  	files: ['<%= filesets.hbs %>'],
+    	tasks: ['emberTemplates', 'uglify']
 	  }
 	}
   });
@@ -76,6 +67,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
 
-  grunt.registerTask('default', ['sass', 'coffee', 'emberTemplates', 'concat']);
+  grunt.registerTask('default', ['watch']);
 
 };
